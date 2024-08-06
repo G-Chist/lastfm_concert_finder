@@ -1,40 +1,19 @@
 import requests
-from api_key import API_KEY
+from bs4 import BeautifulSoup
 
-BASE_URL = 'http://ws.audioscrobbler.com/2.0/'
+BASE_URL = 'https://www.last.fm/music/'
 
-
-def get_upcoming_events(artist_name, api_key):
-    params = {
-        'method': 'artist.getEvents',
-        'artist': artist_name,
-        'api_key': api_key,
-        'format': 'json'
-    }
-
-    response = requests.get(BASE_URL, params=params)
-
-    if response.status_code == 200:
-        data = response.json()
-        events = data.get('events', {}).get('event', [])
-        if not events:
-            print(f"No upcoming events found for artist: {artist_name}")
-        else:
-            for event in events:
-                title = event.get('title')
-                date = event.get('date')
-                venue = event.get('venue', {}).get('name', 'Unknown Venue')
-                location = event.get('venue', {}).get('location', {}).get('city', 'Unknown Location')
-                print(f"Event: {title}")
-                print(f"Date: {date}")
-                print(f"Venue: {venue}")
-                print(f"Location: {location}")
-                print('---')
-    else:
-        print(f"Failed to retrieve data: Status code {response.status_code}")
-
+def get_upcoming_events(artist_name):
+    url = BASE_URL + artist_name + '/+events'
+    response = requests.get(url)
+    html_content = response.content
+    soup = BeautifulSoup(html_content, 'html.parser')
+    music_events = soup.find_all(attrs={"itemtype": "http://schema.org/MusicEvent"})
+    return music_events
 
 if __name__ == "__main__":
     # Example usage
-    artist_name = 'Metallica'
-    get_upcoming_events(artist_name, API_KEY)
+    artist_name = 'Omerta'
+    events = get_upcoming_events(artist_name)
+    print(events)
+
