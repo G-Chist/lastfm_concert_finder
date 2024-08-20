@@ -46,20 +46,49 @@ def parse_events(links):
         soup = BeautifulSoup(html_content, 'html.parser')
 
         address_locality = soup.find('span', itemprop='addressLocality')
-        locality_text = address_locality.get_text()
+        if address_locality:
+            locality_text = address_locality.get_text()
+        else:
+            locality_text = "N/A"
         cities.append(locality_text)
 
         venue_tag = soup.find('strong', itemprop='name')
-        venue_text = venue_tag.get_text()
+        if venue_tag:
+            venue_text = venue_tag.get_text()
+        else:
+            venue_text = "N/A"
         venues.append(venue_text)
 
         start_date_element = soup.find(itemprop='startDate')
-        date_text = start_date_element.get_text(strip=True)
-        day, date = convert_date(date_text)
+        if start_date_element:
+            date_text = start_date_element.get_text(strip=True)
+            day, date = convert_date(date_text)
+        else:
+            day = "N/A"
+            date = "N/A"
         days.append(day)
         dates.append(date)
 
-    return cities, venues, days, dates
+        lineup = ""
+        lineup_section = soup.find('section', id='line-up')
+        if lineup_section:
+            lineup_text = lineup_section.find('h2').get_text(strip=True)
+            lineup += lineup_text
+            lineup += ": "
+
+            band_elements = soup.find_all('p', class_='grid-items-item-main-text', itemprop='name')
+            for element in band_elements:
+                band_name = element.find('a').get_text(strip=True)
+                lineup += band_name
+                lineup += " / "
+        else:
+            lineup = "N/A"
+        
+        lineup = lineup[:-2]
+
+        lineups.append(lineup)
+
+    return cities, venues, days, dates, lineups
 
 
 if __name__ == "__main__":
