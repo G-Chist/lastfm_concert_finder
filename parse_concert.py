@@ -70,21 +70,34 @@ def parse_events(links):
         dates.append(date)
 
         lineup = ""
+        lineup_counter = 0
         lineup_section = soup.find('section', id='line-up')
         if lineup_section:
             lineup_text = lineup_section.find('h2').get_text(strip=True)
             lineup += lineup_text
             lineup += ": "
 
+            # Use regular expression to find the number within parentheses
+            match = re.search(r'\((\d+)\)', lineup)
+
+            if match:
+                # Extract the number (group 1)
+                lineup_number = int(match.group(1))
+
+
             band_elements = soup.find_all('p', class_='grid-items-item-main-text', itemprop='name')
             for element in band_elements:
                 band_name = element.find('a').get_text(strip=True)
                 lineup += band_name
                 lineup += " / "
+                lineup_counter += 1
+
+            if lineup_number < lineup_counter:
+                lineup += " / more bands"
         else:
             lineup = "N/A"
-        
-        lineup = lineup[:-2]
+
+        lineup = lineup[:-3]
 
         lineups.append(lineup)
 
