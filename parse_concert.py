@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime
 
-BASE_URL = 'https://www.last.fm/'
+BASE_URL = 'https://www.last.fm'
 
 
 def convert_date(date_string):
@@ -29,7 +29,7 @@ def convert_date(date_string):
         return None, None
 
 
-def parse_events(links):
+def parse_events(links_list):
 
     dates = []
     days = []
@@ -37,11 +37,20 @@ def parse_events(links):
     cities = []
     venues = []
 
+    concerts = []
+
     for link in links:
 
         url = BASE_URL + link
-        lineup_link = url + '/lineup'
-        response = requests.get(url)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br'
+        }
+        response = requests.get(url, headers=headers)
+        status_code = response.status_code
+        print(status_code)
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
 
@@ -101,10 +110,18 @@ def parse_events(links):
 
         lineups.append(lineup)
 
-    return cities, venues, days, dates, lineups
+        concerts.append([date, locality_text, venue_text, day, lineup])
+
+    # Remove duplicates while preserving order using list comprehension
+    unique_concerts = []
+    [unique_concerts.append(x) for x in concerts if x not in unique_concerts]
+
+    return unique_concerts
 
 
 if __name__ == "__main__":
+    # Example usage
     links = ['/event/4846117+Silver+Scream+Con-cert', '/event/4682903+METALLICA+-+M72+World+Tour', '/event/4682906+Metallica+-+M72+World+Tour', '/event/4816345+Ice+Nine+Kills+at+The+Backyard+on+03+September+2024', '/event/4846117+Silver+Scream+Con-cert', '/event/4682752+Metallica+at+Estadio+GNP+Seguros+on+22+September+2024', '/event/4682762+Metallica+at+Estadio+GNP+Seguros+on+29+September+2024', '/event/4820116+The+Amity+Affliction+at+Riverstage+on+08+November+2024', '/event/4820532+The+Amity+Affliction+at+Hordern+Pavilion+on+09+November+2024', '/event/4820144+The+Amity+Affliction', '/event/4823272+Let+The+Ocean+Take+Me+-+10+Year+Anniversary+Tour', '/event/4845169+The+Amity+Affliction']
     events_parsed = parse_events(links)
-    print(events_parsed)
+    for event in events_parsed:
+        print(event)
