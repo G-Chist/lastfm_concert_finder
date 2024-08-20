@@ -42,11 +42,8 @@ def parse_events(links):
         url = BASE_URL + link
         lineup_link = url + '/lineup'
         response = requests.get(url)
-        response_lineup = requests.get(lineup_link)
         html_content = response.content
-        html_content_lineup = response_lineup.content
         soup = BeautifulSoup(html_content, 'html.parser')
-        soup_lineup = BeautifulSoup(html_content_lineup, 'html.parser')
 
         address_locality = soup.find('span', itemprop='addressLocality')
         locality_text = address_locality.get_text()
