@@ -39,7 +39,7 @@ def parse_events(links_list):
 
     concerts = []
 
-    for link in links:
+    for link in links_list:
 
         url = BASE_URL + link
         headers = {
@@ -50,7 +50,7 @@ def parse_events(links_list):
         }
         response = requests.get(url, headers=headers)
         status_code = response.status_code
-        print(status_code)
+        # print(status_code)
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
 
@@ -93,16 +93,16 @@ def parse_events(links_list):
                 # Extract the number (group 1)
                 lineup_number = int(match.group(1))
 
-
             band_elements = soup.find_all('p', class_='grid-items-item-main-text', itemprop='name')
-            for element in band_elements:
-                band_name = element.find('a').get_text(strip=True)
-                lineup += band_name
-                lineup += " / "
-                lineup_counter += 1
+            if band_elements:
+                for element in band_elements:
+                    band_name = element.find('a').get_text(strip=True)
+                    lineup += band_name
+                    lineup += " / "
+                    lineup_counter += 1
 
-            if lineup_number < lineup_counter:
-                lineup += " / more bands"
+                if lineup_number < lineup_counter:
+                    lineup += " / more bands"
         else:
             lineup = "N/A"
 
