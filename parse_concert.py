@@ -50,7 +50,8 @@ def parse_events(links_list):
         }
         response = requests.get(url, headers=headers)
         status_code = response.status_code
-        # print(status_code)
+        okay_message = 'OK'
+        print(f'Status code: {status_code if status_code != 200 else okay_message}')
         html_content = response.content
         soup = BeautifulSoup(html_content, 'html.parser')
 
