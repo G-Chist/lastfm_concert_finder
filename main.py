@@ -5,7 +5,7 @@ from city_distance import get_coordinates, is_within_radius
 from parse_concert import convert_date, parse_events
 
 username = "g_chist"
-top_number = 50
+top_number = 100
 city = "Worcester, MA"
 radius_km = 100
 
@@ -19,9 +19,12 @@ top_bands = []
 for idx, artist in enumerate(top_bands_raw, start=1):
     top_bands.append(artist['name'])
 
+print(top_bands)
+
 parse_counter = 0
 for band in top_bands:
 
+    concert_counter = 0
     try:
         band_concerts_links = get_upcoming_events(band)
         band_concerts = parse_events(band_concerts_links)
@@ -30,10 +33,11 @@ for band in top_bands:
             concert_city = concert[1]
             if concert not in suggested_concerts:
                 suggested_concerts.append(concert)
+                concert_counter += 1
 
         parse_counter += 1
 
-        print(f'{parse_counter} out of {top_number} parsed')
+        print(f'{parse_counter} out of {top_number} parsed ({band}): {len(band_concerts_links)} concerts found, {concert_counter} concerts added')
 
     except:
         print("Timeout error")
