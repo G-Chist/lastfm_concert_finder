@@ -101,12 +101,12 @@ def parse_events(links_list):
                     lineup += " / "
                     lineup_counter += 1
 
-                if lineup_number < lineup_counter:
-                    lineup += " / more bands"
+                if lineup_number > lineup_counter:
+                    lineup += "more bands"
+                else:
+                    lineup = lineup[:-3]
         else:
             lineup = "N/A"
-
-        lineup = lineup[:-3]
 
         lineups.append(lineup)
 
